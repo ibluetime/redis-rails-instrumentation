@@ -12,10 +12,7 @@ class Redis
         color ActiveSupport::LogSubscriber::RED
 
         event :command do |event|                                                
-          next unless logger.debug?
-          debug message(event, 'Redis', event.payload[:commands])
-          debug message(event, 'Redis', event.payload[:commands].to_json)
-          next if skip?(event)                                              
+          next unless logger.debug?                                         
           cmds = event.payload[:commands]
           output = cmds.map do |name, *args|                                               
             if !args.empty?
@@ -24,7 +21,7 @@ class Redis
               "[ #{name.to_s.upcase} ]"
             end
           end.join(' ')
-
+          # next if skip?(output)     
           debug message(event, 'Redis', output)
         end
 
@@ -41,7 +38,7 @@ class Redis
         end
         
         def skip?(event)
-          event.payload.to_json.match?(Regexp.new(commands, true))
+          output.match?(Regexp.new(commands, true))
         end
         
         def commands
