@@ -13,6 +13,7 @@ class Redis
 
         event :command do |event|                                                
           next unless logger.debug?
+          debug message(event, 'Redis', event.payload[:commands].to_json)
           next if skip?(event)                                              
           cmds = event.payload[:commands]
           output = cmds.map do |name, *args|                                               
@@ -39,8 +40,7 @@ class Redis
         end
         
         def skip?(event)
-          event.payload.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
-               .to_json.match?(Regexp.new(commands, true))
+          event.payload.to_json.match?(Regexp.new(commands, true))
         end
         
         def commands
