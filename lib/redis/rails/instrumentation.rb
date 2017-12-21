@@ -13,9 +13,9 @@ class Redis
 
         event :command do |event|
           next unless logger.debug?
+          next if sidekiq?(event)
           cmds = event.payload[:commands]
-          output = cmds.map do |name, *args|
-            next if name.to_s.upcase == 'BRPOP'                                                 
+          output = cmds.map do |name, *args|                                               
             if !args.empty?
               "[ #{name.to_s.upcase} #{format_arguments(args)} ]"
             else
@@ -36,6 +36,10 @@ class Redis
               arg
             end
           end.join(' ')
+        end
+        
+        def sidekiq?(event)
+          event.payload.to_json.match?(/BRPOP|Sidekiq/i)
         end
       end
     end
