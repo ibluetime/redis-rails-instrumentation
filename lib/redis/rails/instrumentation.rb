@@ -39,7 +39,8 @@ class Redis
         end
         
         def skip?(event)
-          event.payload.to_json.match?(Regexp.new(commands, true))
+          event.payload.to_s.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
+               .to_json.match?(Regexp.new(commands, true))
         end
         
         def commands
