@@ -14,8 +14,8 @@ class Redis
         event :command do |event|
           next unless logger.debug?
           cmds = event.payload[:commands]
-
           output = cmds.map do |name, *args|
+            next if name.to_s.upcase == 'BRPOP'                                                 
             if !args.empty?
               "[ #{name.to_s.upcase} #{format_arguments(args)} ]"
             else
