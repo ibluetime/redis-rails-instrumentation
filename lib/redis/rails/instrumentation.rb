@@ -13,6 +13,7 @@ class Redis
 
         event :command do |event|                                                
           next unless logger.debug?
+          debug message(event, 'Redis', event.payload[:commands])
           debug message(event, 'Redis', event.payload[:commands].to_json)
           next if skip?(event)                                              
           cmds = event.payload[:commands]
