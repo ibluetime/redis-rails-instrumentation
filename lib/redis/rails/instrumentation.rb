@@ -38,7 +38,7 @@ class Redis
           end.join(' ')
         end
         
-        def skip?(event)
+        def skip?(output)
           output.match?(Regexp.new(commands, true))
         end
         
