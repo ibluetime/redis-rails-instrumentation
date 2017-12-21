@@ -12,8 +12,9 @@ class Redis
         color ActiveSupport::LogSubscriber::RED
 
         event :command do |event|
+          debug message(event, 'Redis', event.payload.to_json)                                                 
           next unless logger.debug?
-          next if sidekiq?(event)
+          next if sidekiq?(event)                                              
           cmds = event.payload[:commands]
           output = cmds.map do |name, *args|                                               
             if !args.empty?
