@@ -11,10 +11,9 @@ class Redis
                                                             label: 'Redis' do
         color ActiveSupport::LogSubscriber::RED
 
-        event :command do |event|
-          debug message(event, 'Redis', event.payload.to_json)                                                 
+        event :command do |event|                                                
           next unless logger.debug?
-          next if sidekiq?(event)                                              
+          next if skip?(event)                                              
           cmds = event.payload[:commands]
           output = cmds.map do |name, *args|                                               
             if !args.empty?
@@ -39,8 +38,19 @@ class Redis
           end.join(' ')
         end
         
-        def sidekiq?(event)
-          event.payload.to_json.match?(/BRPOP|Sidekiq/i)
+        def skip?(event)
+          event.payload.to_json.match?(Regexp.new(commands, true))
+        end
+        
+        def commands
+          [
+            'sidekiq',
+            'brpop',
+            '("sadd","processes")',
+            '("incrby","stat:processed")',
+            '("zrangebyscore","schedule")',
+            '("zrangebyscore","retry")'
+          ].join('|')
         end
       end
     end
