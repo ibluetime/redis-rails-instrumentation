@@ -47,6 +47,8 @@ class Redis
             'Sidekiq',
             '(BRPOP queue)',
             '(SADD processes)',
+            '(SMEMBERS processes)',
+            '(SCARD processes)',
             '(INCRBY stat:processed)',
             '(ZRANGEBYSCORE schedule)',
             '(ZRANGEBYSCORE retry)'
