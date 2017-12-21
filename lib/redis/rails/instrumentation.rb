@@ -12,7 +12,7 @@ class Redis
         color ActiveSupport::LogSubscriber::RED
 
         event :command do |event|                                                
-          next unless logger.debug?                                         
+          next unless logger.debug?                                       
           cmds = event.payload[:commands]
           output = cmds.map do |name, *args|                                               
             if !args.empty?
@@ -21,7 +21,8 @@ class Redis
               "[ #{name.to_s.upcase} ]"
             end
           end.join(' ')
-          # next if skip?(output)     
+      
+          next if skip?(output)
           debug message(event, 'Redis', output)
         end
 
@@ -43,12 +44,12 @@ class Redis
         
         def commands
           [
-            'sidekiq',
-            'brpop',
-            '("sadd","processes")',
-            '("incrby","stat:processed")',
-            '("zrangebyscore","schedule")',
-            '("zrangebyscore","retry")'
+            'Sidekiq',
+            '(BRPOP queue)',
+            '(SCARD processes)',
+            '(INCRBY stat:processed)',
+            '(ZRANGEBYSCORE schedule)',
+            '(ZRANGEBYSCORE retry)'
           ].join('|')
         end
       end
